@@ -1,0 +1,52 @@
+//
+// Created by mingj on 2019/10/16.
+//
+
+#ifndef NDN_FFMPEG_RTC_FFMPEGHELPER_H
+#define NDN_FFMPEG_RTC_FFMPEGHELPER_H
+
+#include <iostream>
+#include <functional>
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+#include <libavdevice/avdevice.h>
+#include <libavutil/avutil.h>
+#include <libavutil/imgutils.h>
+}
+
+#define USE_FFMPEG
+
+class FFmpegHelper {
+    class FFmpegFailedException : public std::runtime_error {
+    public:
+        FFmpegFailedException(const std::string &what) : std::runtime_error(what) {
+
+        }
+    };
+    typedef std::function<void(AVFrame *pFrame)> DecodeCallbackFunc;
+
+private:
+    AVFormatContext* pFormatContext = nullptr;
+public:
+    FFmpegHelper();
+    ~FFmpegHelper();
+    static void init();
+    FFmpegHelper* initFormatContext();
+    FFmpegHelper* openCamera(const std::string& av_input_short_name = "video4linux2", const std::string& url = "/dev/video0");
+    int findFirstStreamIndexByType(enum AVMediaType avMediaType);
+    AVCodecContext* openCodec(enum AVMediaType avMediaType);
+    AVFrame * allocAVFrameAndDataBufferWithType(enum AVPixelFormat pix_fmt, int width, int height, int align = 1);
+    AVPacket * allocAVPacket();
+    SwsContext *SWS_GetContext(AVCodecContext *pCodecContext, enum AVPixelFormat dstFormat, int flags = SWS_BICUBIC,
+            SwsFilter* srcFilter = nullptr, SwsFilter* dstFilter = nullptr, const double *param = nullptr);
+
+    FFmpegHelper* decode(AVCodecContext* avCodecContext, AVPacket* packet, AVFrame* pFrame,
+                         const DecodeCallbackFunc& callbackFunc);
+
+    AVFormatContext* getFormatContext();
+};
+
+
+#endif //NDN_FFMPEG_RTC_FFMPEGHELPER_H
