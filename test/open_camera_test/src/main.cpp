@@ -35,8 +35,6 @@ int main() {
     AVCodecContext *pCodecContext = fFmpegHelper.initFormatContext()
             ->openCamera()
             ->openCodec(AVMEDIA_TYPE_VIDEO);
-//    av_guess_format()
-avformat_new_stream()
     AVFrame *pFrame, *pFrameYUV;
     pFrame = av_frame_alloc();
     pFrameYUV = FFmpegHelper::allocAVFrameAndDataBufferWithType(AV_PIX_FMT_YUV420P, pCodecContext->width,

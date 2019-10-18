@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <functional>
+#include <FFmpegFailedException.h>
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -19,12 +20,6 @@ extern "C" {
 #define USE_FFMPEG
 
 class FFmpegHelper {
-    class FFmpegFailedException : public std::runtime_error {
-    public:
-        FFmpegFailedException(const std::string &what) : std::runtime_error(what) {
-
-        }
-    };
     typedef std::function<void(AVFrame *pFrame)> DecodeCallbackFunc;
 
 private:
