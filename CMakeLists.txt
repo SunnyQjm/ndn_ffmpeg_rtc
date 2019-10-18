@@ -43,7 +43,3 @@ set(FFMPEG_HELPER_LIBRARY ffmpeg_helper)
 add_subdirectory(test/sdl_helper_test)
 add_subdirectory(test/open_camera_test)
 
-if (NOT ${PROJECT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-    file(COPY "${PROJECT_SOURCE_DIR}/res" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-endif()
-

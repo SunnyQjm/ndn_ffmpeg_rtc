@@ -37,9 +37,9 @@ public:
     FFmpegHelper* openCamera(const std::string& av_input_short_name = "video4linux2", const std::string& url = "/dev/video0");
     int findFirstStreamIndexByType(enum AVMediaType avMediaType);
     AVCodecContext* openCodec(enum AVMediaType avMediaType);
-    AVFrame * allocAVFrameAndDataBufferWithType(enum AVPixelFormat pix_fmt, int width, int height, int align = 1);
-    AVPacket * allocAVPacket();
-    SwsContext *SWS_GetContext(AVCodecContext *pCodecContext, enum AVPixelFormat dstFormat, int flags = SWS_BICUBIC,
+    static AVFrame * allocAVFrameAndDataBufferWithType(enum AVPixelFormat pix_fmt, int width, int height, int align = 1);
+    static AVPacket * allocAVPacket();
+    static SwsContext *SWS_GetContext(AVCodecContext *pCodecContext, enum AVPixelFormat dstFormat, int flags = SWS_BICUBIC,
             SwsFilter* srcFilter = nullptr, SwsFilter* dstFilter = nullptr, const double *param = nullptr);
 
     FFmpegHelper* decode(AVCodecContext* avCodecContext, AVPacket* packet, AVFrame* pFrame,

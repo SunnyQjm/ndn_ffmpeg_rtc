@@ -35,10 +35,12 @@ int main() {
     AVCodecContext *pCodecContext = fFmpegHelper.initFormatContext()
             ->openCamera()
             ->openCodec(AVMEDIA_TYPE_VIDEO);
+//    av_guess_format()
+avformat_new_stream()
     AVFrame *pFrame, *pFrameYUV;
     pFrame = av_frame_alloc();
-    pFrameYUV = fFmpegHelper.allocAVFrameAndDataBufferWithType(AV_PIX_FMT_YUV420P, pCodecContext->width,
-                                                               pCodecContext->height);
+    pFrameYUV = FFmpegHelper::allocAVFrameAndDataBufferWithType(AV_PIX_FMT_YUV420P, pCodecContext->width,
+                                                                pCodecContext->height);
     int screenW = pCodecContext->width;
     int screenH = pCodecContext->height;
     SDL2Helper sdl2Helper(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER);
@@ -46,8 +48,8 @@ int main() {
                             screenW, screenH)
             ->createRenderer();
 
-    auto *packet = fFmpegHelper.allocAVPacket();
-    SwsContext *imageConvertCtx = fFmpegHelper.SWS_GetContext(pCodecContext, AV_PIX_FMT_YUV420P);
+    auto *packet = FFmpegHelper::allocAVPacket();
+    SwsContext *imageConvertCtx = FFmpegHelper::SWS_GetContext(pCodecContext, AV_PIX_FMT_YUV420P);
     SDL_Texture *texture = sdl2Helper.createTexture(SDL_PIXELFORMAT_YV12,
                                                     SDL_TEXTUREACCESS_STREAMING, pCodecContext->width,
                                                     pCodecContext->height);
@@ -68,6 +70,10 @@ int main() {
             if (av_read_frame(pFormatContext, packet) >= 0) {
                 fFmpegHelper.decode(pCodecContext, packet, pFrame,
                                     [=, &sdl2Helper](AVFrame *frame) {
+                                        /**
+                                         * sws_scale
+                                         * https://blog.csdn.net/u010029439/article/details/82859206
+                                         */
                                         sws_scale(imageConvertCtx,
                                                   (const unsigned char *const *) frame->data,
                                                   frame->linesize,
@@ -81,7 +87,6 @@ int main() {
                                                 ->renderPresent()
                                                 ->delay(40);
                                     });
-                av_packet_unref(packet);
             } else {
                 thread_exit = 1;
             }

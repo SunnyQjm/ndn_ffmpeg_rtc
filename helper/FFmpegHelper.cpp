@@ -95,6 +95,7 @@ FFmpegHelper *FFmpegHelper::decode(AVCodecContext *avCodecContext, AVPacket *pac
     while (avcodec_receive_frame(avCodecContext, pFrame) >= 0) {
         callbackFunc(pFrame);
     }
+    av_packet_unref(packet);
     return this;
 }
 
