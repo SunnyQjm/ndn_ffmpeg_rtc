@@ -28,8 +28,6 @@ EasyEncoder::EasyEncoder(enum AVCodecID codecId) {
 EasyEncoder::~EasyEncoder() {
     avcodec_close(pCodecContext);
     av_free(pCodecContext);
-//    av_freep(&pFrame->data[0]);
-//    av_frame_free(&pFrame);
 }
 
 EasyEncoder *EasyEncoder::initCodecParam(const CodecContextParam &param) {
@@ -47,28 +45,12 @@ EasyEncoder *EasyEncoder::prepareEncode() {
     // 打开编码器
     if (avcodec_open2(pCodecContext, pCodec, nullptr) < 0) {
         EasyEncoder::throwException("Could not open codec");
-    } else {
-        cout << "avcodec open success" << endl;
     }
-//    pFrame = av_frame_alloc();
-//    if (!pFrame) {
-//        EasyEncoder::throwException("Could not allocate video frame");
-//    }
-//    pFrame->format = pCodecContext->pix_fmt;
-//    pFrame->width = pCodecContext->width;
-//    pFrame->height = pCodecContext->height;
-//    int ret = av_image_alloc(pFrame->data, pFrame->linesize, pCodecContext->width, pCodecContext->height,
-//                             pCodecContext->pix_fmt,
-//                             16);
-//    if (ret < 0) {
-//        EasyEncoder::throwException("Could not allocate raw picture buffer");
-//    }
     return this;
 }
 
 void EasyEncoder::throwException(const std::string &msg) {
     std::string logMsg = "EasyEncoder -> " + msg;
-    cout << logMsg << endl;
     throw FFmpegFailedException(logMsg);
 }
 
@@ -78,7 +60,6 @@ EasyEncoder *EasyEncoder::encode(AVFrame *pFrame, const EasyEncoder::EncodeCallb
     pkt.size = 0;
     int ret = avcodec_send_frame(pCodecContext, pFrame);
     if (ret != 0) {
-        std::cout << "fuck: " << ret << std::endl;
         return this;
     }
     while (avcodec_receive_packet(pCodecContext, &pkt) >= 0) {

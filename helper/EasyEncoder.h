@@ -28,7 +28,7 @@ class EasyEncoder {
     typedef std::function<void(AVPacket *pkt)> EncodeCallbackFunc;
 
 private:
-    AVPacket pkt;
+    AVPacket pkt{};
     AVCodecContext *pCodecContext = nullptr;
     AVCodec *pCodec = nullptr;
 
