@@ -31,22 +31,25 @@ private:
     AVPacket pkt{};
     AVCodecContext *pCodecContext = nullptr;
     AVCodec *pCodec = nullptr;
+    enum AVCodecID codecId;
 
-    static void throwException(const std::string& msg);
+    static void throwException(const std::string &msg);
 
 public:
-    EasyEncoder(enum AVCodecID codecId);
+    explicit EasyEncoder(enum AVCodecID codecId);
+
     /**
      * 设置一些编码参数
      * @param param
      * @return
      */
-    EasyEncoder* initCodecParam(const CodecContextParam& param);
+    EasyEncoder *initCodecParam(const CodecContextParam &param);
+
     /**
      * 完成一些编码前的准备工作
      * @return
      */
-    EasyEncoder* prepareEncode();
+    EasyEncoder *prepareEncode();
 
     /**
      * 编码
@@ -54,7 +57,8 @@ public:
      * @param callback
      * @return
      */
-    EasyEncoder* encode(AVFrame *pFrame, const EncodeCallbackFunc& callback);
+    EasyEncoder *encode(AVFrame *pFrame, const EncodeCallbackFunc &callback);
+
     ~EasyEncoder();
 };
 

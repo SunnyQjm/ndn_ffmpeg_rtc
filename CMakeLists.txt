@@ -25,11 +25,11 @@ include_directories(${SDL2_INCLUDE_DIR})
 include_directories(helper)
 include_directories(helper/exception)
 
-add_library(sdl_helper SHARED helper/SDL2Helper.cpp helper/EasyEncoder.cpp)
+add_library(sdl_helper SHARED helper/SDL2Helper.cpp)
 add_library(sdl_helper_static STATIC helper/SDL2Helper.cpp helper/EasyEncoder.cpp)
 set_target_properties(sdl_helper_static PROPERTIES OUTPUT_NAME "sdl_helper")
 
-add_library(ffmpeg_helper SHARED helper/FFmpegHelper.cpp)
+add_library(ffmpeg_helper SHARED helper/FFmpegHelper.cpp helper/EasyEncoder.cpp helper/EasyDecoder.cpp)
 add_library(ffmpeg_helper_static STATIC helper/FFmpegHelper.cpp)
 set_target_properties(ffmpeg_helper_static PROPERTIES OUTPUT_NAME "ffmpeg_helper")
 
@@ -44,4 +44,4 @@ set(FFMPEG_HELPER_LIBRARY ffmpeg_helper)
 add_subdirectory(test/sdl_helper_test)
 add_subdirectory(test/open_camera_test)
 add_subdirectory(test/video_encoder_test)
-
+add_subdirectory(test/open_camera_encode_and_decode_local)
