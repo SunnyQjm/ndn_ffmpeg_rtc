@@ -29,6 +29,7 @@ FFmpegHelper *FFmpegHelper::initFormatContext() {
 FFmpegHelper *FFmpegHelper::openCamera(const std::string &av_input_short_name, const std::string &url) {
     // Linux 打开摄像头设备的输入流
     AVInputFormat *avInputFormat = av_find_input_format(av_input_short_name.c_str());
+    av_register_input_format(avInputFormat);
     if (avformat_open_input(&pFormatContext, url.c_str(), avInputFormat, nullptr) != 0) {
         throw FFmpegFailedException("Couldn't open input stream.");
     }
@@ -54,15 +55,15 @@ AVFormatContext *FFmpegHelper::getFormatContext() {
 }
 
 AVCodecContext *FFmpegHelper::openCodec(enum AVMediaType avMediaType) {
-    int index = this->findFirstStreamIndexByType(avMediaType);
-    AVCodecContext *pCodecCtx = this->pFormatContext->streams[index]->codec;
-    AVCodec *pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
-    if (pCodec == nullptr) {
-        throw FFmpegFailedException("Codec not found.");
-    }
-    if (avcodec_open2(pCodecCtx, pCodec, nullptr) < 0) {
-        throw FFmpegFailedException("Could not open codec.");
-    }
+        int index = this->findFirstStreamIndexByType(avMediaType);
+        AVCodecContext *pCodecCtx = this->pFormatContext->streams[index]->codec;
+        AVCodec *pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
+        if (pCodec == nullptr) {
+            throw FFmpegFailedException("Codec not found.");
+        }
+        if (avcodec_open2(pCodecCtx, pCodec, nullptr) < 0) {
+            throw FFmpegFailedException("Could not open codec.");
+        }
     return pCodecCtx;
 }
 

@@ -13,6 +13,10 @@ extern "C"
 #include <libavcodec/avcodec.h>
 };
 
+/**
+ * 基于FFmpeg实现的视频解码器
+ *
+ */
 class EasyDecoder {
     typedef std::function<void(AVFrame *frame)> DecodeCallbackFunc;
 private:
@@ -26,10 +30,24 @@ private:
     static void throwException(const std::string &msg);
 
 public:
+    /**
+     * 初始化解码器
+     * @param codecId 待解码的码流的编码类型
+     */
     explicit EasyDecoder(enum AVCodecID codecId);
 
+    /**
+     * 解码前的准备，包括初始化解码器，分配一些必要的数据结构的空间等等
+     * => 在调用decode方法进行解码之前需要调用本接口，且本接口只需要调用一次，便可多次调用decode方法
+     */
     EasyDecoder *prepareDecode();
 
+    /**
+     * 对一个压缩后的packet进行解码成YUV格式的AVFrame
+     * @param packet         待解码的AVPacket（在解码结束后会对传入的AVPacket指针调用av_packet_unref）
+     * @param callback       回调函数，在解码完毕后会调用，可以在这个回调里面处理解码的结果
+     * @return
+     */
     EasyDecoder *decode(AVPacket *packet, const DecodeCallbackFunc &callback);
 
     ~EasyDecoder();

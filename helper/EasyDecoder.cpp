@@ -13,10 +13,11 @@ EasyDecoder::EasyDecoder(enum AVCodecID codecId) : codecId(codecId) {
 }
 
 EasyDecoder *EasyDecoder::prepareDecode() {
-    avcodec_register_all();
-
     // 找到对应格式的解码器
     pCodec = avcodec_find_decoder(codecId);
+
+    avcodec_register(pCodec);
+
     if (!pCodec) {
         throwException("Could not find decoder");
     }

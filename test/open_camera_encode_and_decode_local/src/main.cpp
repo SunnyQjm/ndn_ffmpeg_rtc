@@ -71,13 +71,15 @@ int main() {
     int encodedPacketNum = 0;
     int secondFrameNum = 0;
     for (i = 0; i < 1000; i++) {
-        cout << getTimeStamp() << "(before read frame) -> ";
+        cout << getTimeStamp() << " -> ";
+//        cout << getTimeStamp() << "(before read frame) -> ";
         if (av_read_frame(pFormatContext, packet) >= 0) {
-            cout << getTimeStamp() << "(after read frame) -> ";
+            cout << getTimeStamp() << endl;
+//            cout << getTimeStamp() << "(after read frame) -> ";
             fFmpegHelper.decode(pCodecContext, packet, pFrame,
                                 [=, &sdl2Helper, &easyEncoder, &easyDecoder, &firstFrameNum, &encodedPacketNum, &secondFrameNum](
                                         AVFrame *frame) {
-                                    cout << getTimeStamp() << "(after first decode) -> ";
+//                                    cout << getTimeStamp() << "(after first decode) -> ";
                                     /**
                                      * sws_scale
                                      * https://blog.csdn.net/u010029439/article/details/82859206
@@ -89,12 +91,14 @@ int main() {
                                               pCodecContext->height,
                                               pFrameYUV->data,
                                               pFrameYUV->linesize);
-                                    cout << getTimeStamp() << "(after scale) -> ";
+//                                    cout << getTimeStamp() << "(after scale) -> ";
                                     firstFrameNum++;
+//                                    cout << frame->pkt_size << " -> ";
                                     easyEncoder.encode(pFrameYUV,
                                                        [=, &easyDecoder, &sdl2Helper, &encodedPacketNum, &secondFrameNum](
                                                                AVPacket *pkt) {
-                                                           cout << getTimeStamp() << "(after encode) -> ";
+//                                                           cout << pkt->size << endl;
+//                                                           cout << getTimeStamp() << "(after encode) -> ";
                                                            encodedPacketNum++;
                                                            easyDecoder.decode(pkt, [=, &sdl2Helper, &secondFrameNum](
                                                                    AVFrame *frame1) {
@@ -104,12 +108,12 @@ int main() {
                                                                        ->renderCopy(texture, nullptr, &rect)
                                                                        ->renderPresent();
                                                            });
-                                                           cout << getTimeStamp() << "(after decode) -> ";
+//                                                           cout << getTimeStamp() << "(after decode) -> ";
                                                        });
 
                                 });
         }
-        cout << getTimeStamp() << "(finish one iterator)" << endl;
+//        cout << getTimeStamp() << "(finish one iterator)" << endl;
 
 //        cout << firstFrameNum << " -> " << encodedPacketNum << " -> " << secondFrameNum << endl;
     }

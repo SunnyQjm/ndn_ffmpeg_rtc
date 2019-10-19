@@ -8,6 +8,7 @@
 #include <iostream>
 #include <functional>
 #include <FFmpegFailedException.h>
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -19,6 +20,9 @@ extern "C" {
 
 #define USE_FFMPEG
 
+/**
+ * 理解ffmpeg中的pts，dts，time_base => https://blog.csdn.net/weixin_30532987/article/details/97188953
+ */
 class FFmpegHelper {
     typedef std::function<void(AVFrame *pFrame)> DecodeCallbackFunc;
 
