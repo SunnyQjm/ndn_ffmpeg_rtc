@@ -2,34 +2,20 @@
 // Created by mingj on 2019/10/19.
 //
 #include <iostream>
-#include <FFmpegHelper.h>
+#define USE_FFMPEG
 #include <SDL2Helper.h>
+#include <EasyCamera.h>
 #include <EasyEncoder.h>
 #include <EasyDecoder.h>
-#include <chrono>
 
 using namespace std;
 
-time_t getTimeStamp() {
-    std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> tp = std::chrono::time_point_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now());
-    auto tmp = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch());
-    std::time_t timestamp = tmp.count();
-    //std::time_t timestamp = std::chrono::system_clock::to_time_t(tp);
-    return timestamp;
-
-}
 
 int main() {
-    FFmpegHelper::init();
-    FFmpegHelper fFmpegHelper;
-    AVCodecContext *pCodecContext = fFmpegHelper.initFormatContext()
-            ->openCamera()
-            ->openCodec(AVMEDIA_TYPE_VIDEO);
-    AVFrame *pFrame, *pFrameYUV;
-    pFrame = av_frame_alloc();
-    pFrameYUV = FFmpegHelper::allocAVFrameAndDataBufferWithType(AV_PIX_FMT_YUV420P, pCodecContext->width,
-                                                                pCodecContext->height);
+    EasyCamera easyCamera;
+    easyCamera.openCamera()
+            ->prepare();
+    AVCodecContext *pCodecContext = easyCamera.getCodecCtx();
     int screenW = pCodecContext->width;
     int screenH = pCodecContext->height;
     SDL2Helper sdl2Helper(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER);
@@ -37,8 +23,6 @@ int main() {
                             screenW, screenH)
             ->createRenderer();
 
-    auto *packet = FFmpegHelper::allocAVPacket();
-    SwsContext *imageConvertCtx = FFmpegHelper::SWS_GetContext(pCodecContext, AV_PIX_FMT_YUV420P);
     SDL_Texture *texture = sdl2Helper.createTexture(SDL_PIXELFORMAT_YV12,
                                                     SDL_TEXTUREACCESS_STREAMING, pCodecContext->width,
                                                     pCodecContext->height);
@@ -47,8 +31,6 @@ int main() {
     rect.y = 0;
     rect.w = screenW;
     rect.h = screenH;
-
-    AVFormatContext *pFormatContext = fFmpegHelper.getFormatContext();
 
     EasyEncoder easyEncoder(AV_CODEC_ID_H264);
 
@@ -66,60 +48,26 @@ int main() {
             ->prepareEncode();
     EasyDecoder easyDecoder(AV_CODEC_ID_H264);
     easyDecoder.prepareDecode();
-    int i = 0;
-    int firstFrameNum = 0;
-    int encodedPacketNum = 0;
-    int secondFrameNum = 0;
-    for (i = 0; i < 1000; i++) {
-        cout << getTimeStamp() << " -> ";
-//        cout << getTimeStamp() << "(before read frame) -> ";
-        if (av_read_frame(pFormatContext, packet) >= 0) {
-            cout << getTimeStamp() << endl;
-//            cout << getTimeStamp() << "(after read frame) -> ";
-            fFmpegHelper.decode(pCodecContext, packet, pFrame,
-                                [=, &sdl2Helper, &easyEncoder, &easyDecoder, &firstFrameNum, &encodedPacketNum, &secondFrameNum](
-                                        AVFrame *frame) {
-//                                    cout << getTimeStamp() << "(after first decode) -> ";
-                                    /**
-                                     * sws_scale
-                                     * https://blog.csdn.net/u010029439/article/details/82859206
-                                     */
-                                    sws_scale(imageConvertCtx,
-                                              (const unsigned char *const *) frame->data,
-                                              frame->linesize,
-                                              0,
-                                              pCodecContext->height,
-                                              pFrameYUV->data,
-                                              pFrameYUV->linesize);
-//                                    cout << getTimeStamp() << "(after scale) -> ";
-                                    firstFrameNum++;
-//                                    cout << frame->pkt_size << " -> ";
-                                    easyEncoder.encode(pFrameYUV,
-                                                       [=, &easyDecoder, &sdl2Helper, &encodedPacketNum, &secondFrameNum](
-                                                               AVPacket *pkt) {
-//                                                           cout << pkt->size << endl;
-//                                                           cout << getTimeStamp() << "(after encode) -> ";
-                                                           encodedPacketNum++;
-                                                           easyDecoder.decode(pkt, [=, &sdl2Helper, &secondFrameNum](
-                                                                   AVFrame *frame1) {
-                                                               secondFrameNum++;
-                                                               sdl2Helper.updateYUVTexture(texture, &rect, frame1);
-                                                               sdl2Helper.renderClear()
-                                                                       ->renderCopy(texture, nullptr, &rect)
-                                                                       ->renderPresent();
-                                                           });
-//                                                           cout << getTimeStamp() << "(after decode) -> ";
-                                                       });
-
-                                });
+    SDL_Event e;
+    easyCamera.begin([=, &sdl2Helper, &e, &easyEncoder, &easyDecoder](AVFrame *pFrameYUV) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) {
+                return true;
+            }
         }
-//        cout << getTimeStamp() << "(finish one iterator)" << endl;
-
-//        cout << firstFrameNum << " -> " << encodedPacketNum << " -> " << secondFrameNum << endl;
-    }
-    av_free(pFrameYUV);
-    sws_freeContext(imageConvertCtx);
+        easyEncoder.encode(pFrameYUV,
+                           [=, &easyDecoder, &sdl2Helper](
+                                   AVPacket *pkt) {
+                               easyDecoder.decode(pkt, [=, &sdl2Helper](
+                                       AVFrame *frame1) {
+                                   sdl2Helper.updateYUVTexture(texture, &rect, frame1);
+                                   sdl2Helper.renderClear()
+                                           ->renderCopy(texture, nullptr, &rect)
+                                           ->renderPresent();
+                               });
+                           });
+        return false;
+    });
     sdl2Helper.quit();
-    avcodec_close(pCodecContext);
 }
 

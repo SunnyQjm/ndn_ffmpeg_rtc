@@ -54,6 +54,9 @@ EasyCamera *EasyCamera::prepare() {
     pFrame = av_frame_alloc();
     pFrameYUV = EasyFFmpeg::FFmpegUtil::allocAVFrameAndDataBufferWithType(AV_PIX_FMT_YUV420P, pCodecCtx->width,
                                                                           pCodecCtx->height);
+    pFrameYUV->format = AV_PIX_FMT_YUV420P;
+    pFrameYUV->width = pCodecCtx->width;
+    pFrameYUV->height = pCodecCtx->height;
     packet = av_packet_alloc();
 
     imageConvertCtx = EasyFFmpeg::FFmpegUtil::SWS_GetContext(pCodecCtx, AV_PIX_FMT_YUV420P);
@@ -65,11 +68,11 @@ EasyCamera *EasyCamera::begin(const EasyCamera::CameraCaptureCallbackFunc &callb
     bool exit = false;
     while (!exit) {
         if (av_read_frame(pFormatCtx, packet) >= 0) {
-            EasyFFmpeg::FFmpegUtil::decode(pCodecCtx, packet, pFrame, [=](AVFrame *frame) mutable {
+            EasyFFmpeg::FFmpegUtil::decode(pCodecCtx, packet, pFrame, [=, &exit](AVFrame *frame) mutable {
                 /**
-                                         * sws_scale
-                                         * https://blog.csdn.net/u010029439/article/details/82859206
-                                         */
+                 * sws_scale
+                 * https://blog.csdn.net/u010029439/article/details/82859206
+                 */
                 sws_scale(imageConvertCtx,
                           (const unsigned char *const *) frame->data,
                           frame->linesize,
@@ -79,7 +82,6 @@ EasyCamera *EasyCamera::begin(const EasyCamera::CameraCaptureCallbackFunc &callb
                           pFrameYUV->linesize);
                 exit = callback(pFrameYUV);
             });
-            std::cout << "exit: " << exit << std::endl;
         } else {
             exit = true;
         }

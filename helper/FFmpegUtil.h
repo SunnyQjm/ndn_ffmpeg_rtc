@@ -29,7 +29,7 @@ namespace EasyFFmpeg {
         SWS_GetContext(AVCodecContext *pCodecContext, enum AVPixelFormat dstFormat, int flags = SWS_BICUBIC,
                        SwsFilter *srcFilter = nullptr, SwsFilter *dstFilter = nullptr, const double *param = nullptr);
 
-        static bool
+        static void
         decode(AVCodecContext *pCodecCtx, AVPacket *packet, AVFrame *pFrame, const DecodeCallbackFunc &callbackFunc);
         static void
         encode(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPacket *packet, const EncodeCallbackFunc &callbackFunc);
