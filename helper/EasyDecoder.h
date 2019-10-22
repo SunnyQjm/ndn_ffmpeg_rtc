@@ -42,6 +42,8 @@ public:
      */
     EasyDecoder *prepareDecode();
 
+    AVPacket *parse(const uint8_t *buf, size_t size);
+
     /**
      * 对一个压缩后的packet进行解码成YUV格式的AVFrame
      * @param packet         待解码的AVPacket（在解码结束后会对传入的AVPacket指针调用av_packet_unref）

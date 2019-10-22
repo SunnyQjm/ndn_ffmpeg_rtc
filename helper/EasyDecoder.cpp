@@ -60,3 +60,11 @@ EasyDecoder::~EasyDecoder() {
     avcodec_close(pCodecCtx);
     av_free(pCodecCtx);
 }
+
+AVPacket *EasyDecoder::parse(const uint8_t *buf, size_t size) {
+    av_parser_parse2(pCodecParserCtx, pCodecCtx, &pkt.data, &pkt.size, buf, size, AV_NOPTS_VALUE,
+                     AV_NOPTS_VALUE, AV_NOPTS_VALUE);
+    if (pkt.size == 0)
+        return nullptr;
+    return &pkt;
+}
