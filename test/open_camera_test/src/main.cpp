@@ -34,7 +34,6 @@ int main() {
     easyCamera.begin([=, &sdl2Helper, &e](AVFrame *pFrameYUV) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
-                cout << "fuck" << endl;
                 return true;
             }
         }
