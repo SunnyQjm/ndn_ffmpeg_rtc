@@ -44,6 +44,9 @@ include_directories(helper/exception)
 set(SDL_HELPER_LIBRARY sdl_helper)
 set(FFMPEG_HELPER_LIBRARY ffmpeg_helper)
 
+add_subdirectory(ndn_rtp)
+include_directories(ndn_rtp)
+set(NDN_RTP_LIBRARY ndn_rtp)
 
 add_subdirectory(test/sdl_helper_test)
 add_subdirectory(test/open_camera_test)
