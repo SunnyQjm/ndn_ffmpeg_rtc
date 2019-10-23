@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC  -Wall -Wextra -pedantic -std=c++11  -shared -Wl,-soname,libndn_rtp.so -o libndn_rtp.so CMakeFiles/ndn_rtp.dir/ndn_rtpc.cpp.o CMakeFiles/ndn_rtp.dir/ndn_rtpp.cpp.o CMakeFiles/ndn_rtp.dir/recv_list.cpp.o -lpthread -lpcap -lndn-cxx -lboost_system 
