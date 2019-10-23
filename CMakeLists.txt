@@ -22,22 +22,28 @@ endif ()
 
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIR})
-include_directories(helper)
-include_directories(helper/exception)
+#include_directories(helper)
+#include_directories(helper/exception)
 
-add_library(sdl_helper SHARED helper/SDL2Helper.cpp)
+#add_library(sdl_helper SHARED helper/SDL2Helper.cpp)
+#target_include_directories(sdl_helper PUBLIC helper)
 #add_library(sdl_helper_static STATIC helper/SDL2Helper.cpp)
 #set_target_properties(sdl_helper_static PROPERTIES OUTPUT_NAME "sdl_helper")
 
-add_library(ffmpeg_helper SHARED helper/FFmpegHelper.cpp helper/EasyEncoder.cpp helper/EasyDecoder.cpp
-        helper/EasyCamera.cpp helper/FFmpegUtil.cpp)
+#add_library(ffmpeg_helper SHARED helper/FFmpegHelper.cpp helper/EasyEncoder.cpp helper/EasyDecoder.cpp
+#        helper/EasyCamera.cpp helper/FFmpegUtil.cpp)
 #add_library(ffmpeg_helper_static STATIC helper/FFmpegHelper.cpp helper/FFmpegHelper.cpp helper/EasyEncoder.cpp
 #        helper/EasyDecoder.cpp helper/EasyCamera.cpp helper/FFmpegUtil.cpp)
 #set_target_properties(ffmpeg_helper_static PROPERTIES OUTPUT_NAME "ffmpeg_helper")
 
 
+
+add_subdirectory(helper)
+include_directories(helper)
+include_directories(helper/exception)
 set(SDL_HELPER_LIBRARY sdl_helper)
 set(FFMPEG_HELPER_LIBRARY ffmpeg_helper)
+
 
 add_subdirectory(test/sdl_helper_test)
 add_subdirectory(test/open_camera_test)

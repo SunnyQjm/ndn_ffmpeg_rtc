@@ -5,7 +5,7 @@
 #ifndef NDN_FFMPEG_RTC_FFMPEGFAILEDEXCEPTION_H
 #define NDN_FFMPEG_RTC_FFMPEGFAILEDEXCEPTION_H
 
-
+#include <stdexcept>
 class FFmpegFailedException : public std::runtime_error {
 public:
     FFmpegFailedException(const std::string &what) : std::runtime_error(what) {
