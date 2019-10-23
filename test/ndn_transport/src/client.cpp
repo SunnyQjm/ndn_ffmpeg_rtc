@@ -6,7 +6,13 @@
 #define USE_FFMPEG
 #include <SDL2Helper.h>
 #include <EasyDecoder.h>
+#include "ndn_rtpc.h"
 int main() {
+
+	ndn_rtpc myconsumer("/localhost/nfd/producer") ;
+	char buff[200000] ;
+	int recvLen ;
+
     int screenW = 640;
     int screenH = 480;
     SDL2Helper sdl2Helper(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER);
@@ -34,6 +40,9 @@ int main() {
         }
 
         // 在这里接收数据，并得到Packet
+		recvLen = myconsumer.readobj(buff) ;
+		std::cout << "recvLen = " << recvLen << std::endl ;
+		AVPacket *pkt = easyDecoder.parse((const uint8_t*)buff,recvLen) ;
 
         easyDecoder.decode(pkt, [=, &sdl2Helper](
                 AVFrame *frame1) {

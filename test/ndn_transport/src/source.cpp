@@ -9,8 +9,12 @@
 #include <SDL2Helper.h>
 #include <EasyCamera.h>
 #include <EasyEncoder.h>
+#include "ndn_rtpp.h"
 
 int main() {
+
+	ndn_rtpp myproducer("/localhost/nfd/producer") ;
+
     EasyCamera easyCamera;
     easyCamera.openCamera()
             ->prepare();
@@ -47,7 +51,7 @@ int main() {
             ->prepareEncode();
 
     SDL_Event e;
-    easyCamera.begin([=, &sdl2Helper, &e, &easyEncoder](AVFrame *pFrameYUV) {
+    easyCamera.begin([=, &sdl2Helper, &e, &easyEncoder, &myproducer](AVFrame *pFrameYUV) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
                 return true;
@@ -57,8 +61,9 @@ int main() {
         sdl2Helper.renderClear()
                 ->renderCopy(texture, nullptr, &rect)
                 ->renderPresent();
-        easyEncoder.encode(pFrameYUV, [=](AVPacket *pkt) {
+        easyEncoder.encode(pFrameYUV, [=,&myproducer](AVPacket *pkt) {
             // 在这里发送数据
+				myproducer.sendobj((const char*)(pkt->data) , pkt->size ) ;
         });
         return false;
     });
