@@ -65,15 +65,8 @@ EasyDecoder::~EasyDecoder() {
 }
 
 AVPacket *EasyDecoder::parse(const uint8_t *buf, size_t size) {
-    while (size > 0) {
-        int len = av_parser_parse2(pCodecParserCtx, pCodecCtx, &pkt.data, &pkt.size, buf, size, AV_NOPTS_VALUE,
-                                   AV_NOPTS_VALUE, AV_NOPTS_VALUE);
-        buf += len;
-        size -= len;
-        cout << "len: " << len << endl;
-        if (pkt.size != 0)
-            break;
-    }
+    pkt.data = const_cast<uint8_t *>(buf);
+    pkt.size = size;
     if (pkt.size == 0)
         return nullptr;
     return &pkt;

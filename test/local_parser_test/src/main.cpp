@@ -1,5 +1,5 @@
 //
-// Created by mingj on 2019/10/22.
+// Created by mingj on 2019/10/23.
 //
 
 #include <iostream>
@@ -9,11 +9,9 @@
 #include <SDL2Helper.h>
 #include <EasyCamera.h>
 #include <EasyEncoder.h>
-#include "ndn_rtpp.h"
+#include <EasyDecoder.h>
 
 int main() {
-
-    ndn_rtpp myproducer("/localhost/nfd/producer");
 
     EasyCamera easyCamera;
     easyCamera.openCamera()
@@ -50,20 +48,35 @@ int main() {
     easyEncoder.initCodecParam(param)
             ->prepareEncode();
 
+    EasyDecoder easyDecoder(AV_CODEC_ID_H264);
+    easyDecoder.prepareDecode();
+
     SDL_Event e;
-    easyCamera.begin([=, &sdl2Helper, &e, &easyEncoder, &myproducer](AVFrame *pFrameYUV) {
+    easyCamera.begin([=, &sdl2Helper, &e, &easyEncoder, &easyDecoder](AVFrame *pFrameYUV) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
                 return true;
             }
         }
-        sdl2Helper.updateYUVTexture(texture, &rect, pFrameYUV);
-        sdl2Helper.renderClear()
-                ->renderCopy(texture, nullptr, &rect)
-                ->renderPresent();
-        easyEncoder.encode(pFrameYUV, [=, &myproducer](AVPacket *pkt) {
+//        sdl2Helper.updateYUVTexture(texture, &rect, pFrameYUV);
+//        sdl2Helper.renderClear()
+//                ->renderCopy(texture, nullptr, &rect)
+//                ->renderPresent();
+        easyEncoder.encode(pFrameYUV, [=, &easyDecoder, &sdl2Helper](AVPacket *pkt) {
             // 在这里发送数据
-            myproducer.sendobj((const char *) (pkt->data), pkt->size);
+            AVPacket *pkt2 = easyDecoder.parse((const uint8_t *) pkt->data, pkt->size);
+            if (pkt2 == nullptr) {
+                std::cout << "pkt is nullptr" << std::endl;
+                return;
+            }
+            std::cout << "do decode" << std::endl;
+            easyDecoder.decode(pkt2, [=, &sdl2Helper](
+                    AVFrame *frame1) {
+                sdl2Helper.updateYUVTexture(texture, &rect, frame1);
+                sdl2Helper.renderClear()
+                        ->renderCopy(texture, nullptr, &rect)
+                        ->renderPresent();
+            });
         });
         return false;
     });
