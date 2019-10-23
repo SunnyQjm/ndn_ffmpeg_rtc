@@ -34,13 +34,13 @@ int main() {
         }
 
         // 在这里接收数据，并得到Packet
-
-        easyDecoder.decode(pkt, [=, &sdl2Helper](
-                AVFrame *frame1) {
-            sdl2Helper.updateYUVTexture(texture, &rect, frame1);
-            sdl2Helper.renderClear()
-                    ->renderCopy(texture, nullptr, &rect)
-                    ->renderPresent();
-        });
+//        AVPacket* pkt = easyDecoder.parse(buf, size);
+//        easyDecoder.decode(pkt, [=, &sdl2Helper](
+//                AVFrame *frame1) {
+//            sdl2Helper.updateYUVTexture(texture, &rect, frame1);
+//            sdl2Helper.renderClear()
+//                    ->renderCopy(texture, nullptr, &rect)
+//                    ->renderPresent();
+//        });
     }
 }

@@ -58,7 +58,7 @@ int main() {
                 ->renderCopy(texture, nullptr, &rect)
                 ->renderPresent();
         easyEncoder.encode(pFrameYUV, [=](AVPacket *pkt) {
-            // 在这里发送数据
+            // 在这里发送数据 (pkt->data, pkt->size)
         });
         return false;
     });
