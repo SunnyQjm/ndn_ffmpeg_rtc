@@ -43,7 +43,10 @@ int main() {
 		recvLen = myconsumer.readobj(buff) ;
 		std::cout << "recvLen = " << recvLen << std::endl ;
 		AVPacket *pkt = easyDecoder.parse((const uint8_t*)buff,recvLen) ;
-
+		if(pkt == nullptr){
+		    std::cout << "pkt is nullptr" << std::endl;
+            continue;
+		}
         easyDecoder.decode(pkt, [=, &sdl2Helper](
                 AVFrame *frame1) {
             sdl2Helper.updateYUVTexture(texture, &rect, frame1);

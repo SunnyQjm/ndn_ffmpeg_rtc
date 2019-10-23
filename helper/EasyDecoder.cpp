@@ -3,6 +3,9 @@
 //
 
 #include "EasyDecoder.h"
+#include <iostream>
+
+using namespace std;
 
 void EasyDecoder::throwException(const std::string &msg) {
     std::string logMsg = "EasyDecoder -> " + msg;
@@ -67,6 +70,7 @@ AVPacket *EasyDecoder::parse(const uint8_t *buf, size_t size) {
                                    AV_NOPTS_VALUE, AV_NOPTS_VALUE);
         buf += len;
         size -= len;
+        cout << "len: " << len << endl;
         if (pkt.size != 0)
             break;
     }

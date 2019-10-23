@@ -1,4 +1,4 @@
-project(easy_helper)
+project(sdl_helper)
 
 add_library(sdl_helper SHARED SDL2Helper.cpp SDL2Helper.h FFmpegFailedException.cpp FFmpegFailedException.h)
 target_link_libraries(sdl_helper ${SDL2_LIBRARY})
