@@ -57,7 +57,6 @@ int main(int argc, char** argv) {
 		}
         easyDecoder.decode(pkt, [=, &sdl2Helper, &screenW, &screenH](
                 AVFrame *frame1) {
-            cout << "===>" << frame1->width << " -> " << frame1->height << endl;
             if(screenW != frame1->width || screenH != frame1->height) {
                 screenW = frame1->width;
                 screenH = frame1->height;
