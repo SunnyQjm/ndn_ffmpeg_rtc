@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.5)
 project(ndn_ffmpeg_rtc)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -20,6 +20,7 @@ else ()
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O2")
 endif ()
 
+add_compile_options(-g)
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIR})
 #include_directories(helper)
