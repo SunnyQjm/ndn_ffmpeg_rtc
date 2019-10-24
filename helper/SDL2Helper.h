@@ -162,6 +162,8 @@ public:
 
     SDL2Helper *renderTexture(SDL_Texture *texture, int x, int y);
 
+    SDL2Helper *resize(int width, int height);
+
     ///////////////////////////////////////////////////////////
     /////// SDL + FFmpeg wrapper functions
     ///////////////////////////////////////////////////////////

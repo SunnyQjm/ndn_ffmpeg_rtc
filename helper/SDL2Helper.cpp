@@ -138,6 +138,11 @@ SDL_Texture *SDL2Helper::createTexture(Uint32 format, int access, int w, int h) 
     return texture;
 }
 
+SDL2Helper *SDL2Helper::resize(int width, int height) {
+    SDL_SetWindowSize(window, width, height);
+    return this;
+}
+
 
 
 

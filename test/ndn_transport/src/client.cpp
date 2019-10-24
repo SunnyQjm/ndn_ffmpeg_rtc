@@ -55,8 +55,14 @@ int main(int argc, char** argv) {
 		    std::cout << "pkt is nullptr" << std::endl;
             continue;
 		}
-        easyDecoder.decode(pkt, [=, &sdl2Helper](
+        easyDecoder.decode(pkt, [=, &sdl2Helper, &screenW, &screenH](
                 AVFrame *frame1) {
+            cout << "===>" << frame1->width << " -> " << frame1->height << endl;
+            if(screenW != frame1->width || screenH != frame1->height) {
+                screenW = frame1->width;
+                screenH = frame1->height;
+                sdl2Helper.resize(screenW, screenH);
+            }
             sdl2Helper.updateYUVTexture(texture, &rect, frame1);
             sdl2Helper.renderClear()
                     ->renderCopy(texture, nullptr, &rect)
