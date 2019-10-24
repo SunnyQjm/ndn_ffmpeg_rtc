@@ -19,11 +19,12 @@ EasyDecoder *EasyDecoder::prepareDecode() {
     // 找到对应格式的解码器
     pCodec = avcodec_find_decoder(codecId);
 
-    avcodec_register(pCodec);
 
     if (!pCodec) {
         throwException("Could not find decoder");
     }
+    avcodec_register(pCodec);
+
 
     // 创建编解码上下文
     pCodecCtx = avcodec_alloc_context3(pCodec);
@@ -65,9 +66,28 @@ EasyDecoder::~EasyDecoder() {
 }
 
 AVPacket *EasyDecoder::parse(const uint8_t *buf, size_t size) {
-    pkt.data = const_cast<uint8_t *>(buf);
-    pkt.size = size;
+    while (size > 0 || pkt.size == 0) {
+        int len = av_parser_parse2(pCodecParserCtx, pCodecCtx, &pkt.data, &pkt.size, buf, size, AV_NOPTS_VALUE,
+                                   AV_NOPTS_VALUE, AV_NOPTS_VALUE);
+        buf += len;
+        cout << size << " -> " << len <<  " -> " << pkt.size << endl;
+        size -= len;
+    }
     if (pkt.size == 0)
         return nullptr;
     return &pkt;
 }
+
+/**
+ while (size > 0) {
+        int len = av_parser_parse2(pCodecParserCtx, pCodecCtx, &pkt.data, &pkt.size, buf, size, AV_NOPTS_VALUE,
+                                   AV_NOPTS_VALUE, AV_NOPTS_VALUE);
+        buf += len;
+        size -= len;
+        if (pkt.size != 0)
+            break;
+    }
+    if (pkt.size == 0)
+        return nullptr;
+    return &pkt;
+ */

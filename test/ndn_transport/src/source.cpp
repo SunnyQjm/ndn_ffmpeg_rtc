@@ -11,9 +11,14 @@
 #include <EasyEncoder.h>
 #include "ndn_rtpp.h"
 
-int main() {
+using namespace std;
 
-    ndn_rtpp myproducer("/localhost/nfd/producer");
+int main(int argc, char** argv) {
+    if(argc != 2) {
+        cerr << "usage: ./ndn_transport_source <prefix>" << endl;
+        return 1;
+    }
+    ndn_rtpp myproducer(argv[1]);
 
     EasyCamera easyCamera;
     easyCamera.openCamera()

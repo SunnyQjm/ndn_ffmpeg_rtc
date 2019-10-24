@@ -7,9 +7,17 @@
 #include <SDL2Helper.h>
 #include <EasyDecoder.h>
 #include "ndn_rtpc.h"
-int main() {
 
-	ndn_rtpc myconsumer("/localhost/nfd/producer") ;
+using namespace std;
+int main(int argc, char** argv) {
+    if(argc != 2) {
+        cerr << "usage: ./ndn_transport_source <prefix>" << endl;
+        return 1;
+    }
+	ndn_rtpc myconsumer(argv[1]);
+    av_register_all();
+    avformat_network_init();
+    avdevice_register_all();
 	char buff[200000] ;
 	int recvLen ;
 
@@ -54,5 +62,7 @@ int main() {
                     ->renderCopy(texture, nullptr, &rect)
                     ->renderPresent();
         });
+		std::cout << "finish decode" << std::endl;
     }
+    std::cout << "exit: " << exit << std::endl;
 }
