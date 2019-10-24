@@ -19,6 +19,8 @@ public:
 	void insertPkt(char *pkt, int len ,int nextN, uint32_t seq) ;
 	bool hasFrame() ;
 	int getFrame(char **frame) ;
+	void lossFrame(int seq) ;
+	void lossFrame() ;
 
 private:
 	/* data */
