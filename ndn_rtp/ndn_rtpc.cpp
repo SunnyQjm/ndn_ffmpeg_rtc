@@ -53,6 +53,7 @@ void ndn_rtpc::myExpressInterest(string name, long lifetime){
 			bind(&ndn_rtpc::onData,this,_1,_2),
 			bind(&ndn_rtpc::onNack,this,_1,_2),
 			bind(&ndn_rtpc::onTimeout,this,_1));
+	//cout << "expressInterest : " << name << endl ;
 }
 
 void ndn_rtpc::myExpressInterest_detect(string name , long lifetime){
@@ -122,12 +123,12 @@ void ndn_rtpc::onData(const Interest& interest , const Data& data){
 	string name = interest.getName().toUri() ;
 	int idx1 = name.find_last_of('/') + 1 ;
 	int cur_pkt_seq = atoi(name.substr(idx1,name.size() - idx1).data()) ;
-//	cout << "packet seq = " << cur_pkt_seq << endl ;
+	cout << "packet seq = " << cur_pkt_seq << endl ;
 	char buff[10000] ;
 	int len = data.getContent().value_size() ;
 	memcpy(buff , data.getContent().value(), len) ;
 	int frameLen = *((int*)buff);
-//	cout << "frameLen = " << frameLen << endl ;
+	cout << "frameLen = " << frameLen << endl ;
 	int nextN = frameLen / 8000 ;
 	if(frameLen < 0) nextN = -1 ;
 	else if(frameLen % 8000 != 0 ) nextN ++ ;
@@ -142,10 +143,14 @@ void ndn_rtpc::onNack(const Interest& interest, const lp::Nack& nack){
 
 void ndn_rtpc::onTimeout(const Interest& interest) {
 	long lifetime = interest.getInterestLifetime().count() ;
+	string interestName = interest.getName().toUri() ;
 	if(lifetime > 1000){
-		this->m_face.shutdown() ;
-		exit(0) ;
-		return ;
+		cout << "too many timeout" << endl ;
+		int idx1 = interestName.find_last_of('/') +1 ;
+		int lossPktSeq = atoi(interestName.substr(idx1,interestName.length() 
+					- idx1).data()) ;
+		recvList.lossFrame(lossPktSeq) ;
+		interestName = interestName.substr(0,idx1) + to_string(lossPktSeq+1) ;
 	}
-	myExpressInterest(interest.getName().toUri() , lifetime+200) ;
+	myExpressInterest( interestName , lifetime+200) ;
 }
