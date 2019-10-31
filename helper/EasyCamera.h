@@ -25,6 +25,7 @@ private:
     AVFormatContext *pFormatCtx;
     AVCodecContext *pCodecCtx{};
     AVCodec *pCodec{};
+    int videoIndex = -1;
 
     static void throwException(const std::string &msg);
 

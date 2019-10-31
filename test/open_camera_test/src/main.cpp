@@ -11,7 +11,7 @@ using namespace std;
 
 int main() {
     EasyCamera easyCamera;
-    easyCamera.openCamera()
+    easyCamera.openCamera("video4linux2")
             ->prepare();
     AVCodecContext *pCodecContext = easyCamera.getCodecCtx();
     int screenW = pCodecContext->width;

@@ -32,8 +32,7 @@ int main(int argc, char** argv) {
             ->createRenderer();
 
     SDL_Texture *texture = sdl2Helper.createTexture(SDL_PIXELFORMAT_YV12,
-                                                    SDL_TEXTUREACCESS_STREAMING, pCodecContext->width,
-                                                    pCodecContext->height);
+                                                    SDL_TEXTUREACCESS_STREAMING, screenW, screenH);
     SDL_Rect rect;
     rect.x = 0;
     rect.y = 0;

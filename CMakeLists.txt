@@ -53,6 +53,8 @@ set(NDN_RTP_LIBRARY ndn_rtp)
 add_subdirectory(test/sdl_helper_test)
 add_subdirectory(test/open_camera_test)
 add_subdirectory(test/video_encoder_test)
+
 add_subdirectory(test/open_camera_encode_and_decode_local)
 add_subdirectory(test/ndn_transport)
 add_subdirectory(test/local_parser_test)
+add_subdirectory(test/open_microphone_test)

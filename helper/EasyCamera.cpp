@@ -40,8 +40,8 @@ EasyCamera *EasyCamera::openCamera(const std::string &av_input_short_name, const
 
 EasyCamera *EasyCamera::prepare() {
     // 找到解码器并打开
-    int index = EasyFFmpeg::FFmpegUtil::findFirstStreamIndexByType(this->pFormatCtx, AVMEDIA_TYPE_VIDEO);
-    pCodecCtx = this->pFormatCtx->streams[index]->codec;
+    videoIndex = EasyFFmpeg::FFmpegUtil::findFirstStreamIndexByType(this->pFormatCtx, AVMEDIA_TYPE_VIDEO);
+    pCodecCtx = this->pFormatCtx->streams[videoIndex]->codec;
     pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
     if (pCodec == nullptr) {
         throw FFmpegFailedException("Codec not found.");
@@ -68,20 +68,22 @@ EasyCamera *EasyCamera::begin(const EasyCamera::CameraCaptureCallbackFunc &callb
     bool exit = false;
     while (!exit) {
         if (av_read_frame(pFormatCtx, packet) >= 0) {
-            EasyFFmpeg::FFmpegUtil::decode(pCodecCtx, packet, pFrame, [=, &exit](AVFrame *frame) mutable {
-                /**
-                 * sws_scale
-                 * https://blog.csdn.net/u010029439/article/details/82859206
-                 */
-                sws_scale(imageConvertCtx,
-                          (const unsigned char *const *) frame->data,
-                          frame->linesize,
-                          0,
-                          pCodecCtx->height,
-                          pFrameYUV->data,
-                          pFrameYUV->linesize);
-                exit = callback(pFrameYUV);
-            });
+            if (packet->stream_index == videoIndex) {
+                EasyFFmpeg::FFmpegUtil::decode(pCodecCtx, packet, pFrame, [=, &exit](AVFrame *frame) {
+                    /**
+                     * sws_scale
+                     * https://blog.csdn.net/u010029439/article/details/82859206
+                     */
+                    sws_scale(imageConvertCtx,
+                              (const unsigned char *const *) frame->data,
+                              frame->linesize,
+                              0,
+                              pCodecCtx->height,
+                              pFrameYUV->data,
+                              pFrameYUV->linesize);
+                    exit = callback(pFrameYUV);
+                });
+            }
         } else {
             exit = true;
         }

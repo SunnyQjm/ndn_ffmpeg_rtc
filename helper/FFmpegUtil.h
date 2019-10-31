@@ -25,12 +25,17 @@ namespace EasyFFmpeg {
         static AVFrame *
         allocAVFrameAndDataBufferWithType(enum AVPixelFormat pix_fmt, int width, int height, int align = 1);
 
+        static AVFrame *
+        allocAVFrameAndDataBufferWithTyp(enum AVSampleFormat sampleFormat, int nbChannels, int nbSamples,
+                                         int align = 1);
+
         static SwsContext *
         SWS_GetContext(AVCodecContext *pCodecContext, enum AVPixelFormat dstFormat, int flags = SWS_BICUBIC,
                        SwsFilter *srcFilter = nullptr, SwsFilter *dstFilter = nullptr, const double *param = nullptr);
 
         static void
         decode(AVCodecContext *pCodecCtx, AVPacket *packet, AVFrame *pFrame, const DecodeCallbackFunc &callbackFunc);
+
         static void
         encode(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPacket *packet, const EncodeCallbackFunc &callbackFunc);
     };
