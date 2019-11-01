@@ -56,7 +56,7 @@ void EasyFFmpeg::FFmpegUtil::decode(AVCodecContext *pCodecCtx, AVPacket *packet,
     int ret = avcodec_send_packet(pCodecCtx, packet);
     if (ret != 0)
         return;
-    while (avcodec_receive_frame(pCodecCtx, pFrame) >= 0) {
+    while (avcodec_receive_frame(pCodecCtx, pFrame) == 0) {
         callbackFunc(pFrame);
     }
     av_packet_unref(packet);

@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <FFmpegHelper.h>
-#include <EasyEncoder.h>
+#include <EasyVideoEncoder.h>
 
 using namespace std;
 
@@ -22,7 +22,7 @@ int main() {
     auto *packet = FFmpegHelper::allocAVPacket();
     SwsContext *imageConvertCtx = FFmpegHelper::SWS_GetContext(pCodecContext, AV_PIX_FMT_YUV420P);
     AVFormatContext *pFormatContext = fFmpegHelper.getFormatContext();
-    EasyEncoder easyEncoder(AV_CODEC_ID_H264);
+    EasyVideoEncoder easyEncoder(AV_CODEC_ID_H264);
     CodecContextParam param{};
     param.bit_rate = 400000;
     param.width = pCodecContext->width;

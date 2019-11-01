@@ -8,7 +8,7 @@
 
 #include <SDL2Helper.h>
 #include <EasyCamera.h>
-#include <EasyEncoder.h>
+#include <EasyVideoEncoder.h>
 #include "ndn_rtpp.h"
 
 using namespace std;
@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     rect.w = screenW;
     rect.h = screenH;
 
-    EasyEncoder easyEncoder(AV_CODEC_ID_H264);
+    EasyVideoEncoder easyEncoder(AV_CODEC_ID_H264);
 
     CodecContextParam param{};
     param.bit_rate = 400000;

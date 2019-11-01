@@ -2,8 +2,8 @@
 // Created by mingj on 2019/10/18.
 //
 
-#ifndef NDN_FFMPEG_RTC_EASYENCODER_H
-#define NDN_FFMPEG_RTC_EASYENCODER_H
+#ifndef NDN_FFMPEG_RTC_EASYVIDEOENCODER_H
+#define NDN_FFMPEG_RTC_EASYVIDEOENCODER_H
 
 #include <functional>
 #include "FFmpegFailedException.h"
@@ -24,7 +24,8 @@ struct CodecContextParam {
     enum AVPixelFormat pix_fmt;
 };
 
-class EasyEncoder {
+class EasyVideoEncoder {
+public:
     typedef std::function<void(AVPacket *pkt)> EncodeCallbackFunc;
 
 private:
@@ -36,20 +37,20 @@ private:
     static void throwException(const std::string &msg);
 
 public:
-    explicit EasyEncoder(enum AVCodecID codecId);
+    explicit EasyVideoEncoder(enum AVCodecID codecId);
 
     /**
      * 设置一些编码参数
      * @param param
      * @return
      */
-    EasyEncoder *initCodecParam(const CodecContextParam &param);
+    EasyVideoEncoder *initCodecParam(const CodecContextParam &param);
 
     /**
      * 完成一些编码前的准备工作
      * @return
      */
-    EasyEncoder *prepareEncode();
+    EasyVideoEncoder *prepareEncode();
 
     /**
      * 编码
@@ -57,10 +58,10 @@ public:
      * @param callback
      * @return
      */
-    EasyEncoder *encode(AVFrame *pFrame, const EncodeCallbackFunc &callback);
+    EasyVideoEncoder *encode(AVFrame *pFrame, const EncodeCallbackFunc &callback);
 
-    ~EasyEncoder();
+    ~EasyVideoEncoder();
 };
 
 
-#endif //NDN_FFMPEG_RTC_EASYENCODER_H
+#endif //NDN_FFMPEG_RTC_EASYVIDEOENCODER_H

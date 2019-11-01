@@ -23,6 +23,7 @@ EasyMicroPhone::EasyMicroPhone() {
 }
 
 EasyMicroPhone::~EasyMicroPhone() {
+    av_free(&pAudioFrameOut->data[0]);
     av_free(pAudioFrameOut);
     av_free(pAudioFrame);
     swr_free(&audioConvertCtx);
@@ -58,12 +59,14 @@ EasyMicroPhone *EasyMicroPhone::prepare() {
 
     uint64_t out_channel_layout = AV_CH_LAYOUT_MONO;
     int out_nb_samples = 1024;
-    int out_sample_rate = 44100;
-    auto out_sample_format = AV_SAMPLE_FMT_S16;
+    int out_sample_rate = 48000;
+    auto out_sample_format = AV_SAMPLE_FMT_FLT;
     int out_nb_channels = av_get_channel_layout_nb_channels(out_channel_layout);
 
     pAudioFrame = av_frame_alloc();
     pAudioFrameOut = EasyFFmpeg::FFmpegUtil::allocAVFrameAndDataBufferWithTyp(out_sample_format, out_nb_channels, out_nb_samples);
+    pAudioFrameOut->format = out_sample_format;
+    pAudioFrameOut->nb_samples = out_nb_samples;
     packet = av_packet_alloc();
 
     int in_channel_layout = av_get_default_channel_layout(pCodecCtx->channels);
@@ -92,12 +95,12 @@ EasyMicroPhone *EasyMicroPhone::begin(const EasyMicroPhone::MicrophoneCallbackFu
     bool exit = false;
     while (!exit) {
         if (av_read_frame(pFormatCtx, packet) >= 0) {
-            cout << "?" << endl;
             if (packet->stream_index == audioIndex) {
                 EasyFFmpeg::FFmpegUtil::decode(pCodecCtx, packet, pAudioFrame, [=, &exit](AVFrame *frame) {
-                    swr_convert(audioConvertCtx, pAudioFrameOut->data, MAX_AUDIO_FRAME_SIZE, (const uint8_t **) frame->data,
-                                frame->nb_samples);
-                    exit = callback(pAudioFrameOut);
+//                    swr_convert(audioConvertCtx, pAudioFrameOut->data, MAX_AUDIO_FRAME_SIZE, (const uint8_t **) frame->data,
+//                                frame->nb_samples);
+//                    pAudioFrameOut->pkt_size = frame->pkt_size;
+                    exit = callback(frame);
                 });
             }
         }

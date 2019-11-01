@@ -2,20 +2,20 @@
 // Created by mingj on 2019/10/18.
 //
 
-#include "EasyDecoder.h"
+#include "EasyVideoDecoder.h"
 #include <iostream>
 
 using namespace std;
 
-void EasyDecoder::throwException(const std::string &msg) {
-    std::string logMsg = "EasyDecoder -> " + msg;
+void EasyVideoDecoder::throwException(const std::string &msg) {
+    std::string logMsg = "EasyVideoDecoder -> " + msg;
     throw FFmpegFailedException(logMsg);
 }
 
-EasyDecoder::EasyDecoder(enum AVCodecID codecId) : codecId(codecId) {
+EasyVideoDecoder::EasyVideoDecoder(enum AVCodecID codecId) : codecId(codecId) {
 }
 
-EasyDecoder *EasyDecoder::prepareDecode() {
+EasyVideoDecoder *EasyVideoDecoder::prepareDecode() {
     // 找到对应格式的解码器
     pCodec = avcodec_find_decoder(codecId);
 
@@ -47,7 +47,7 @@ EasyDecoder *EasyDecoder::prepareDecode() {
     return this;
 }
 
-EasyDecoder *EasyDecoder::decode(AVPacket *packet, const EasyDecoder::DecodeCallbackFunc &callback) {
+EasyVideoDecoder *EasyVideoDecoder::decode(AVPacket *packet, const EasyVideoDecoder::DecodeCallbackFunc &callback) {
     int ret = avcodec_send_packet(pCodecCtx, packet);
     if (ret != 0)
         return this;
@@ -58,14 +58,14 @@ EasyDecoder *EasyDecoder::decode(AVPacket *packet, const EasyDecoder::DecodeCall
     return this;
 }
 
-EasyDecoder::~EasyDecoder() {
+EasyVideoDecoder::~EasyVideoDecoder() {
     av_parser_close(pCodecParserCtx);
     av_frame_free(&pFrame);
     avcodec_close(pCodecCtx);
     av_free(pCodecCtx);
 }
 
-AVPacket *EasyDecoder::parse(const uint8_t *buf, size_t size) {
+AVPacket *EasyVideoDecoder::parse(const uint8_t *buf, size_t size) {
     while (size > 0 || pkt.size == 0) {
         int len = av_parser_parse2(pCodecParserCtx, pCodecCtx, &pkt.data, &pkt.size, buf, size, AV_NOPTS_VALUE,
                                    AV_NOPTS_VALUE, AV_NOPTS_VALUE);

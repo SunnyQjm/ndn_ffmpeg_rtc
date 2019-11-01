@@ -32,10 +32,10 @@ include_directories(${SDL2_INCLUDE_DIR})
 #add_library(sdl_helper_static STATIC helper/SDL2Helper.cpp)
 #set_target_properties(sdl_helper_static PROPERTIES OUTPUT_NAME "sdl_helper")
 
-#add_library(ffmpeg_helper SHARED helper/FFmpegHelper.cpp helper/EasyEncoder.cpp helper/EasyDecoder.cpp
+#add_library(ffmpeg_helper SHARED helper/FFmpegHelper.cpp helper/EasyVideoEncoder.cpp helper/EasyVideoDecoder.cpp
 #        helper/EasyCamera.cpp helper/FFmpegUtil.cpp)
-#add_library(ffmpeg_helper_static STATIC helper/FFmpegHelper.cpp helper/FFmpegHelper.cpp helper/EasyEncoder.cpp
-#        helper/EasyDecoder.cpp helper/EasyCamera.cpp helper/FFmpegUtil.cpp)
+#add_library(ffmpeg_helper_static STATIC helper/FFmpegHelper.cpp helper/FFmpegHelper.cpp helper/EasyVideoEncoder.cpp
+#        helper/EasyVideoDecoder.cpp helper/EasyCamera.cpp helper/FFmpegUtil.cpp)
 #set_target_properties(ffmpeg_helper_static PROPERTIES OUTPUT_NAME "ffmpeg_helper")
 
 
@@ -58,3 +58,4 @@ add_subdirectory(test/open_camera_encode_and_decode_local)
 add_subdirectory(test/ndn_transport)
 add_subdirectory(test/local_parser_test)
 add_subdirectory(test/open_microphone_test)
+add_subdirectory(test/audio_player_test)

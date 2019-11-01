@@ -2,20 +2,20 @@
 // Created by mingj on 2019/10/18.
 //
 
-#include "EasyEncoder.h"
+#include "EasyVideoEncoder.h"
 #include <iostream>
 
 using namespace std;
 
-EasyEncoder::EasyEncoder(enum AVCodecID cid): codecId(cid) {
+EasyVideoEncoder::EasyVideoEncoder(enum AVCodecID cid): codecId(cid) {
     pCodec = avcodec_find_encoder(codecId);
     avcodec_register(pCodec);
     if (!pCodec) {
-        EasyEncoder::throwException("Could not find encoder");
+        EasyVideoEncoder::throwException("Could not find encoder");
     }
     pCodecContext = avcodec_alloc_context3(pCodec);
     if (!pCodecContext) {
-        EasyEncoder::throwException("Could not allocate video codec context");
+        EasyVideoEncoder::throwException("Could not allocate video codec context");
     }
 
     if (codecId == AV_CODEC_ID_H264) {
@@ -25,12 +25,12 @@ EasyEncoder::EasyEncoder(enum AVCodecID cid): codecId(cid) {
 }
 
 
-EasyEncoder::~EasyEncoder() {
+EasyVideoEncoder::~EasyVideoEncoder() {
     avcodec_close(pCodecContext);
     av_free(pCodecContext);
 }
 
-EasyEncoder *EasyEncoder::initCodecParam(const CodecContextParam &param) {
+EasyVideoEncoder *EasyVideoEncoder::initCodecParam(const CodecContextParam &param) {
     pCodecContext->bit_rate = param.bit_rate;
     pCodecContext->width = param.width;
     pCodecContext->height = param.height;
@@ -41,22 +41,22 @@ EasyEncoder *EasyEncoder::initCodecParam(const CodecContextParam &param) {
     return this;
 }
 
-EasyEncoder *EasyEncoder::prepareEncode() {
+EasyVideoEncoder *EasyVideoEncoder::prepareEncode() {
 
 
     // 打开编码器
     if (avcodec_open2(pCodecContext, pCodec, nullptr) < 0) {
-        EasyEncoder::throwException("Could not open codec");
+        EasyVideoEncoder::throwException("Could not open codec");
     }
     return this;
 }
 
-void EasyEncoder::throwException(const std::string &msg) {
-    std::string logMsg = "EasyEncoder -> " + msg;
+void EasyVideoEncoder::throwException(const std::string &msg) {
+    std::string logMsg = "EasyVideoEncoder -> " + msg;
     throw FFmpegFailedException(logMsg);
 }
 
-EasyEncoder *EasyEncoder::encode(AVFrame *pFrame, const EasyEncoder::EncodeCallbackFunc &callback) {
+EasyVideoEncoder *EasyVideoEncoder::encode(AVFrame *pFrame, const EasyVideoEncoder::EncodeCallbackFunc &callback) {
     av_init_packet(&pkt);
     pkt.data = nullptr;
     pkt.size = 0;

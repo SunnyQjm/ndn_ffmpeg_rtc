@@ -5,7 +5,7 @@
 #include <iostream>
 #define USE_FFMPEG
 #include <SDL2Helper.h>
-#include <EasyDecoder.h>
+#include <EasyVideoDecoder.h>
 #include "ndn_rtpc.h"
 
 using namespace std;
@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
     rect.y = 0;
     rect.w = screenW;
     rect.h = screenH;
-    EasyDecoder easyDecoder(AV_CODEC_ID_H264);
+    EasyVideoDecoder easyDecoder(AV_CODEC_ID_H264);
     easyDecoder.prepareDecode();
     SDL_Event e;
     bool exit = false;

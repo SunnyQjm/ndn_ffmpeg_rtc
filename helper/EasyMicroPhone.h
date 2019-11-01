@@ -17,6 +17,9 @@ extern "C"
 #include <libswresample/swresample.h>
 };
 
+/**
+ * https://blog.csdn.net/quange_style/article/details/90082748
+ */
 class EasyMicroPhone {
     typedef std::function<bool(AVFrame *pFrame)> MicrophoneCallbackFunc;
 private:

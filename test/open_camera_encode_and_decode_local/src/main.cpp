@@ -5,8 +5,8 @@
 #define USE_FFMPEG
 #include <SDL2Helper.h>
 #include <EasyCamera.h>
-#include <EasyEncoder.h>
-#include <EasyDecoder.h>
+#include <EasyVideoEncoder.h>
+#include <EasyVideoDecoder.h>
 
 using namespace std;
 
@@ -32,7 +32,7 @@ int main() {
     rect.w = screenW;
     rect.h = screenH;
 
-    EasyEncoder easyEncoder(AV_CODEC_ID_H264);
+    EasyVideoEncoder easyEncoder(AV_CODEC_ID_H264);
 
     CodecContextParam param{};
     param.bit_rate = 400000;
@@ -46,7 +46,7 @@ int main() {
 
     easyEncoder.initCodecParam(param)
             ->prepareEncode();
-    EasyDecoder easyDecoder(AV_CODEC_ID_H264);
+    EasyVideoDecoder easyDecoder(AV_CODEC_ID_H264);
     easyDecoder.prepareDecode();
     SDL_Event e;
     easyCamera.begin([=, &sdl2Helper, &e, &easyEncoder, &easyDecoder](AVFrame *pFrameYUV) {
