@@ -10,6 +10,8 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <utility>
+#include <functional>
+#include <queue>
 
 // Judge if use SDL2_image extension library
 #ifdef SDL2_HELPER_USE_SDL2_IMAGE
@@ -73,6 +75,21 @@ namespace SDLCleanUp {
         }
         SDL_FreeSurface(surf);
     }
+
+    template<>
+    inline void cleanup<SDL_mutex>(SDL_mutex *mutex) {
+        if (!mutex)
+            return;
+        SDL_DestroyMutex(mutex);
+    }
+
+    template<>
+    inline void cleanup<SDL_cond>(SDL_cond *cond) {
+        if (!cond)
+            return;
+        SDL_DestroyCond(cond);
+    }
+
 }
 
 class SDL2Helper {
@@ -83,6 +100,12 @@ class SDL2Helper {
         }
     };
 
+public:
+    struct AudioFrame {
+        Uint8 *data;
+        int size;
+    };
+
 private:
     bool isSDL2Init = false;
     bool isSDL2ImageInit = false;
@@ -90,14 +113,17 @@ private:
 
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
-
+    SDL_AudioSpec audioSpec;
+    std::queue<SDL2Helper::AudioFrame> audioQueue;
+    SDL_mutex *audioQueueMutex;
+    SDL_cond *audioQueueCond;
 public:
 
     /**
      * Create SDL2Helper Object and init SDL2 library
      * @param flags is the param of SDL2_Init
      */
-    SDL2Helper(Uint32 flags);
+    explicit SDL2Helper(Uint32 flags);
 
     /**
      * The Wrapper of SDL_CreateWindow
@@ -171,6 +197,91 @@ public:
     SDL2Helper *updateYUVTexture(SDL_Texture *texture, const SDL_Rect *rect, const AVFrame *pFrame);
 #endif
 
+
+    //////////////////////////////////////////////////////////
+    ////// Audio 相关
+    //////////////////////////////////////////////////////////
+
+    /**
+     * DSP frequency -- samples per second
+     * @param freq
+     * @return
+     */
+    SDL2Helper *setAudioSpecFreq(int freq);
+
+    /**
+     * Audio data format
+     * @param format
+     * @return
+     */
+    SDL2Helper *setAudioSpecFormat(SDL_AudioFormat format);
+
+    /**
+     * Number of channels: 1 mono, 2 stereo
+     * @param channels
+     * @return
+     */
+    SDL2Helper *setAudioSpecChannels(Uint8 channels);
+
+    /**
+     * Audio buffer silence value (calculated)
+     * @param silence
+     * @return
+     */
+    SDL2Helper *setAudioSpecSilence(Uint8 silence);
+
+    /**
+     * Audio buffer size in samples (power of 2)
+     * @param samples
+     * @return
+     */
+    SDL2Helper *setAudioSpecSamples(Uint16 samples);
+
+    /**
+     * Necessary for some compile environments
+     * @param padding
+     * @return
+     */
+    SDL2Helper *setAudioSpecPadding(Uint16 padding);
+
+    /**
+     * Audio buffer size in bytes (calculated)
+     * @param size
+     * @return
+     */
+    SDL2Helper *setAudioSpecSize(Uint32 size);
+
+    /**
+     * Callback that feeds the audio device (NULL to use SDL_QueueAudio()).
+     * @param callback
+     * @return
+     */
+    SDL2Helper *setAudioSpecCallback(SDL_AudioCallback callback);
+
+    /**
+     * 防止PCM音频裸流数据到缓存队列当中数据
+     * @param data
+     * @param size
+     * @return
+     */
+    SDL2Helper *putAudioData(Uint8 *data, int size);
+
+    /**
+     * 从缓存队列里取出一个PCM音频裸流
+     * @return
+     */
+    SDL2Helper *getAudioFrame(AudioFrame *frame);
+
+    SDL2Helper *openAudio();
+
+    SDL2Helper *pauseAudio(int onPause);
+    /**
+     * 使用非Callback方式播放音频时使用这个接口喂PCM裸流给SDL的音频队列
+     * @param data
+     * @param len
+     * @return
+     */
+    SDL2Helper *feedPCM(const void *data, Uint32 len);
 
     //////////////////////////////////////////////////////////
     ///////// Utils

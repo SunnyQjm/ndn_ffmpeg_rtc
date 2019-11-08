@@ -10,16 +10,48 @@
 #include <EasyCamera.h>
 #include <EasyVideoEncoder.h>
 #include "ndn_rtpp.h"
+#include <pthread.h>
+#include <EasyMicroPhone.h>
 
 using namespace std;
 
-int main(int argc, char** argv) {
-    if(argc != 2) {
+
+void *captureAudio(void *args) {
+    string prefix = (char *) args;
+    prefix += "/audio";
+    ndn_rtpp audioProducer(prefix);
+    EasyMicroPhone easyMicroPhone;
+    easyMicroPhone.openMicrophone()
+            ->prepare();
+    SDL_Event e;
+    easyMicroPhone.begin([=, &audioProducer, &e](AVFrame *frame) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) {
+                return true;
+            }
+        }
+        audioProducer.sendobj(reinterpret_cast<const char *>(frame->data[0]), frame->pkt_size);
+        // 在这边发送音频
+        return false;
+    });
+    SDL_Quit();
+}
+
+int main(int argc, char **argv) {
+
+    if (argc != 2) {
         cerr << "usage: ./ndn_transport_source <prefix>" << endl;
         return 1;
     }
-    ndn_rtpp myproducer(argv[1]);
+    string prefix = argv[1];
+    prefix += "/video";
+    ndn_rtpp myproducer(prefix);
 
+    // 创建捕获音频的线程
+    pthread_t id;
+    pthread_create(&id, nullptr, captureAudio, (void *) argv[1]);
+
+    cout << "what?" << endl;
     EasyCamera easyCamera;
     easyCamera.openCamera()
             ->prepare();
@@ -71,6 +103,7 @@ int main(int argc, char** argv) {
         });
         return false;
     });
+
     sdl2Helper.quit();
 }
 

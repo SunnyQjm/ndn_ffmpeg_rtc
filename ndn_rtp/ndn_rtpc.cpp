@@ -107,7 +107,7 @@ void ndn_rtpc::getFrame(){
 	while(recvList.hasFrame()){
 		struct frame_t *frame = new frame_t;
 		frame->len = recvList.getFrame(&(frame->data)) ;
-		cout << "getFrame : len = " << frame->len << endl ;
+//		cout << "getFrame : len = " << frame->len << endl ;
 		needSig = this->myFrameQ.empty() ;
 		pthread_mutex_lock(&frame_mutex) ;
 		this->myFrameQ.push(frame) ;
@@ -123,12 +123,12 @@ void ndn_rtpc::onData(const Interest& interest , const Data& data){
 	string name = interest.getName().toUri() ;
 	int idx1 = name.find_last_of('/') + 1 ;
 	int cur_pkt_seq = atoi(name.substr(idx1,name.size() - idx1).data()) ;
-	cout << "packet seq = " << cur_pkt_seq << endl ;
+//	cout << "packet seq = " << cur_pkt_seq << endl ;
 	char buff[10000] ;
 	int len = data.getContent().value_size() ;
 	memcpy(buff , data.getContent().value(), len) ;
 	int frameLen = *((int*)buff);
-	cout << "frameLen = " << frameLen << endl ;
+//	cout << "frameLen = " << frameLen << endl ;
 	int nextN = frameLen / 8000 ;
 	if(frameLen < 0) nextN = -1 ;
 	else if(frameLen % 8000 != 0 ) nextN ++ ;

@@ -28,7 +28,7 @@ int main() {
 
 
     easyMicroPhone.begin([=, &num, &easyAudioEncoder](AVFrame *frame) {
-        cout << "what: " << frame->pkt_size << endl;
+        // 在这里发送
         fwrite(frame->data[0], 1, frame->pkt_size, fp_pcm);
 //        while(audio_len>0)//Wait until finish
 //            SDL_Delay(1);

@@ -15,6 +15,17 @@ SDL2Helper::SDL2Helper(Uint32 flags) {
     } else {
         // initial SDL2 library success
         isSDL2Init = true;
+    };
+
+    if ((flags & SDL_INIT_AUDIO) != 0) {             // 开启了音频支持就初始化音频相关的操作
+        // 默认的callback
+//        this->audioSpec.callback = [](void *userData, Uint8 *stream, int len) {
+//            SDL_memset(stream, 0, len);
+//            AudioFrame audioFrame;
+//        };
+        this->audioSpec.callback = nullptr;
+        this->audioQueueMutex = SDL_CreateMutex();
+        this->audioQueueCond = SDL_CreateCond();
     }
 }
 
@@ -40,7 +51,7 @@ SDL2Helper *SDL2Helper::createRenderer(int index, Uint32 flags) {
 }
 
 SDL2Helper *SDL2Helper::quit() {
-    SDLCleanUp::cleanup(renderer, window);
+    SDLCleanUp::cleanup(renderer, window, audioQueueMutex, audioQueueCond);
 #ifdef SDL2_HELPER_USE_SDL2_IMAGE
     if (isSDL2ImageInit) {
         IMG_Quit();
@@ -142,6 +153,95 @@ SDL2Helper *SDL2Helper::resize(int width, int height) {
     SDL_SetWindowSize(window, width, height);
     return this;
 }
+
+SDL2Helper *SDL2Helper::setAudioSpecFreq(int freq) {
+    this->audioSpec.freq = freq;
+    return this;
+}
+
+SDL2Helper *SDL2Helper::setAudioSpecFormat(SDL_AudioFormat format) {
+    this->audioSpec.format = format;
+    return this;
+}
+
+SDL2Helper *SDL2Helper::setAudioSpecChannels(Uint8 channels) {
+    this->audioSpec.channels = channels;
+    return this;
+}
+
+SDL2Helper *SDL2Helper::setAudioSpecSilence(Uint8 silence) {
+    this->audioSpec.silence = silence;
+    return this;
+}
+
+SDL2Helper *SDL2Helper::setAudioSpecSamples(Uint16 samples) {
+    this->audioSpec.samples = samples;
+    return this;
+}
+
+SDL2Helper *SDL2Helper::setAudioSpecPadding(Uint16 padding) {
+    this->audioSpec.padding = padding;
+    return this;
+}
+
+SDL2Helper *SDL2Helper::setAudioSpecSize(Uint32 size) {
+    this->audioSpec.size = size;
+    return this;
+}
+
+SDL2Helper *SDL2Helper::setAudioSpecCallback(SDL_AudioCallback callback) {
+    this->audioSpec.callback = callback;
+    return this;
+}
+
+
+SDL2Helper *SDL2Helper::putAudioData(Uint8 *data, int size) {
+    if (size > 0) {
+        AudioFrame audioFrame{};
+        audioFrame.data = static_cast<Uint8 *>(malloc(size));
+        audioFrame.size = size;
+        memcpy(audioFrame.data, data, size);
+        SDL_LockMutex(audioQueueMutex);
+        audioQueue.push(audioFrame);
+        SDL_CondSignal(audioQueueCond);
+        SDL_UnlockMutex(audioQueueMutex);
+    }
+    return this;
+}
+
+SDL2Helper *SDL2Helper::getAudioFrame(AudioFrame *frame) {
+    SDL_LockMutex(audioQueueMutex);
+    if (audioQueue.empty()) {
+        SDL_CondWait(audioQueueCond, audioQueueMutex);
+    }
+    auto audioFrame = audioQueue.front();
+    frame->data = audioFrame.data;
+    frame->size = audioFrame.size;
+    SDL_UnlockMutex(audioQueueMutex);
+    return this;
+}
+
+
+SDL2Helper *SDL2Helper::openAudio() {
+    if (SDL_OpenAudio(&audioSpec, nullptr) < 0) {
+        throwSDLFailedException("Open audio failed");
+    }
+    return this;
+}
+
+SDL2Helper *SDL2Helper::feedPCM(const void *data, Uint32 len) {
+    // 使用SDL_OpenAudio方式打开，devId为1
+    SDL_QueueAudio(1, data, len);
+    return this;
+}
+
+SDL2Helper *SDL2Helper::pauseAudio(int onPause) {
+    SDL_PauseAudio(onPause);
+    return this;
+}
+
+
+
 
 
 
