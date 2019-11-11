@@ -39,6 +39,15 @@ SDL2Helper *SDL2Helper::createWindow(const std::string &title,
     return this;
 }
 
+
+SDL2Helper *SDL2Helper::createWindowFrom(const void *data) {
+    window = SDL_CreateWindowFrom(data);
+    if(window == nullptr) {
+        this->throwSDLFailedException("CreateWindow");
+    }
+    return this;
+}
+
 SDL2Helper *SDL2Helper::createRenderer(int index, Uint32 flags) {
     if (this->window == nullptr) {
         throw SDLFailedException("Please invoke createWindow to create a SDL_Window object success first!");
@@ -239,6 +248,7 @@ SDL2Helper *SDL2Helper::pauseAudio(int onPause) {
     SDL_PauseAudio(onPause);
     return this;
 }
+
 
 
 

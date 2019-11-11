@@ -37,6 +37,7 @@ int main() {
                 return true;
             }
         }
+        cout << pFrameYUV->pkt_size << endl;
         sdl2Helper.updateYUVTexture(texture, &rect, pFrameYUV);
         sdl2Helper.renderClear()
                 ->renderCopy(texture, nullptr, &rect)

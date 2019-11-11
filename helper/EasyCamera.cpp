@@ -19,8 +19,11 @@ EasyCamera::EasyCamera() {
 }
 
 EasyCamera::~EasyCamera() {
+    av_free(pFrameYUV->data[0]);
     av_free(pFrameYUV);
-    sws_freeContext(imageConvertCtx);
+    av_free(pFrameRgb->data[0]);
+    av_free(pFrameRgb);
+    sws_freeContext(yuvImageConvert);
     avcodec_close(pCodecCtx);
     avformat_free_context(pFormatCtx);
 }
@@ -54,12 +57,21 @@ EasyCamera *EasyCamera::prepare() {
     pFrame = av_frame_alloc();
     pFrameYUV = EasyFFmpeg::FFmpegUtil::allocAVFrameAndDataBufferWithType(AV_PIX_FMT_YUV420P, pCodecCtx->width,
                                                                           pCodecCtx->height);
+    pFrameRgb = EasyFFmpeg::FFmpegUtil::allocAVFrameAndDataBufferWithType(AV_PIX_FMT_RGB32, pCodecCtx->width,
+                                                                          pCodecCtx->height);
+
     pFrameYUV->format = AV_PIX_FMT_YUV420P;
     pFrameYUV->width = pCodecCtx->width;
     pFrameYUV->height = pCodecCtx->height;
+
+    pFrameRgb->format = AV_PIX_FMT_RGB32;
+    pFrameRgb->width = pCodecCtx->width;
+    pFrameRgb->height = pCodecCtx->height;
+
     packet = av_packet_alloc();
 
-    imageConvertCtx = EasyFFmpeg::FFmpegUtil::SWS_GetContext(pCodecCtx, AV_PIX_FMT_YUV420P);
+    yuvImageConvert = EasyFFmpeg::FFmpegUtil::SWS_GetContext(pCodecCtx, AV_PIX_FMT_YUV420P);
+    rgbImageConvert = EasyFFmpeg::FFmpegUtil::SWS_GetContext(pCodecCtx, AV_PIX_FMT_RGB32);
 
     return this;
 }
@@ -74,7 +86,7 @@ EasyCamera *EasyCamera::begin(const EasyCamera::CameraCaptureCallbackFunc &callb
                      * sws_scale
                      * https://blog.csdn.net/u010029439/article/details/82859206
                      */
-                    sws_scale(imageConvertCtx,
+                    sws_scale(yuvImageConvert,
                               (const unsigned char *const *) frame->data,
                               frame->linesize,
                               0,
@@ -89,4 +101,42 @@ EasyCamera *EasyCamera::begin(const EasyCamera::CameraCaptureCallbackFunc &callb
         }
     }
     return this;
+}
+
+EasyCamera *EasyCamera::begin(const EasyCamera::CameraCaptureCallbackFunc &yuvCallback,
+                              const EasyCamera::CameraCaptureCallbackFunc &rgbCallback) {
+    bool exit = false;
+    while (!exit) {
+        if (av_read_frame(pFormatCtx, packet) >= 0) {
+            if (packet->stream_index == videoIndex) {
+                EasyFFmpeg::FFmpegUtil::decode(pCodecCtx, packet, pFrame, [=, &exit](AVFrame *frame) {
+                    /**
+                     * sws_scale
+                     * https://blog.csdn.net/u010029439/article/details/82859206
+                     */
+                    sws_scale(rgbImageConvert,
+                              (const unsigned char *const *) frame->data,
+                              frame->linesize,
+                              0,
+                              pCodecCtx->height,
+                              pFrameRgb->data,
+                              pFrameRgb->linesize
+                    );
+                    rgbCallback(pFrameRgb);
+                    sws_scale(yuvImageConvert,
+                              (const unsigned char *const *) frame->data,
+                              frame->linesize,
+                              0,
+                              pCodecCtx->height,
+                              pFrameYUV->data,
+                              pFrameYUV->linesize);
+                    exit = yuvCallback(pFrameYUV);
+                });
+            }
+        } else {
+            exit = true;
+        }
+    }
+    return this;
+    return nullptr;
 }

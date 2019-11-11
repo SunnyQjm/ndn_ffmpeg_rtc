@@ -13,6 +13,8 @@ add_library(ffmpeg_helper_static STATIC FFmpegHelper.cpp EasyVideoEncoder.cpp Ea
         EasyMicroPhone.h EasyMicroPhone.cpp EasyAudioEncoder.h EasyAudioEncoder.cpp)
 set_target_properties(ffmpeg_helper_static PROPERTIES OUTPUT_NAME "ffmpeg_helper")
 
+
+
 target_link_libraries(ffmpeg_helper avcodec avformat swscale avdevice avutil)
 
 

@@ -19,9 +19,10 @@ extern "C"
 class EasyCamera {
     typedef std::function<bool(AVFrame *pFrameYUV)> CameraCaptureCallbackFunc;
 private:
-    AVFrame *pFrame{}, *pFrameYUV{};
+    AVFrame *pFrame{}, *pFrameYUV{}, *pFrameRgb{};
     AVPacket *packet{};
-    SwsContext *imageConvertCtx{};
+    SwsContext *yuvImageConvert{};
+    SwsContext *rgbImageConvert{};
     AVFormatContext *pFormatCtx;
     AVCodecContext *pCodecCtx{};
     AVCodec *pCodec{};
@@ -40,6 +41,7 @@ public:
     EasyCamera *prepare();
 
     EasyCamera *begin(const CameraCaptureCallbackFunc &callback);
+    EasyCamera *begin(const CameraCaptureCallbackFunc &yuvCallback, const CameraCaptureCallbackFunc &rgbCallback);
 
     // Get
     AVCodecContext *getCodecCtx() { return pCodecCtx; }

@@ -138,6 +138,11 @@ public:
     ) noexcept(false);
 
     SDL2Helper *
+    createWindowFrom(
+            const void *data
+    );
+
+    SDL2Helper *
     createRenderer(int index = -1, Uint32 flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC) noexcept(false);
 
 
@@ -194,7 +199,9 @@ public:
     /////// SDL + FFmpeg wrapper functions
     ///////////////////////////////////////////////////////////
 #ifdef USE_FFMPEG
+
     SDL2Helper *updateYUVTexture(SDL_Texture *texture, const SDL_Rect *rect, const AVFrame *pFrame);
+
 #endif
 
 
@@ -275,6 +282,7 @@ public:
     SDL2Helper *openAudio();
 
     SDL2Helper *pauseAudio(int onPause);
+
     /**
      * 使用非Callback方式播放音频时使用这个接口喂PCM裸流给SDL的音频队列
      * @param data
@@ -304,11 +312,13 @@ public:
 };
 
 #ifdef USE_FFMPEG
+
 SDL2Helper *SDL2Helper::updateYUVTexture(SDL_Texture *texture, const SDL_Rect *rect, const AVFrame *pFrame) {
     SDL_UpdateYUVTexture(texture, rect, pFrame->data[0], pFrame->linesize[0], pFrame->data[1], pFrame->linesize[1],
                          pFrame->data[2], pFrame->linesize[2]);
     return this;
 }
+
 #endif
 
 
