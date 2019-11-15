@@ -47,9 +47,9 @@ int main(int argc, char **argv) {
     prefix += "/video";
     ndn_rtpp myproducer(prefix);
 
-    // 创建捕获音频的线程
-    pthread_t id;
-    pthread_create(&id, nullptr, captureAudio, (void *) argv[1]);
+//    // 创建捕获音频的线程
+//    pthread_t id;
+//    pthread_create(&id, nullptr, captureAudio, (void *) argv[1]);
 
     cout << "what?" << endl;
     EasyCamera easyCamera;
