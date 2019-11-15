@@ -58,18 +58,18 @@ int main(int argc, char **argv) {
     AVCodecContext *pCodecContext = easyCamera.getCodecCtx();
     int screenW = pCodecContext->width;
     int screenH = pCodecContext->height;
-    SDL2Helper sdl2Helper(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER);
-    sdl2Helper.createWindow("My Camera Capture test Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                            screenW, screenH)
-            ->createRenderer();
-
-    SDL_Texture *texture = sdl2Helper.createTexture(SDL_PIXELFORMAT_YV12,
-                                                    SDL_TEXTUREACCESS_STREAMING, screenW, screenH);
-    SDL_Rect rect;
-    rect.x = 0;
-    rect.y = 0;
-    rect.w = screenW;
-    rect.h = screenH;
+//    SDL2Helper sdl2Helper(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER);
+//    sdl2Helper.createWindow("My Camera Capture test Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+//                            screenW, screenH)
+//            ->createRenderer();
+//
+//    SDL_Texture *texture = sdl2Helper.createTexture(SDL_PIXELFORMAT_YV12,
+//                                                    SDL_TEXTUREACCESS_STREAMING, screenW, screenH);
+//    SDL_Rect rect;
+//    rect.x = 0;
+//    rect.y = 0;
+//    rect.w = screenW;
+//    rect.h = screenH;
 
     EasyVideoEncoder easyEncoder(AV_CODEC_ID_H264);
 
@@ -87,16 +87,16 @@ int main(int argc, char **argv) {
             ->prepareEncode();
 
     SDL_Event e;
-    easyCamera.begin([=, &sdl2Helper, &e, &easyEncoder, &myproducer](AVFrame *pFrameYUV) {
+    easyCamera.begin([=, &e, &easyEncoder, &myproducer](AVFrame *pFrameYUV) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
                 return true;
             }
         }
-        sdl2Helper.updateYUVTexture(texture, &rect, pFrameYUV);
-        sdl2Helper.renderClear()
-                ->renderCopy(texture, nullptr, &rect)
-                ->renderPresent();
+//        sdl2Helper.updateYUVTexture(texture, &rect, pFrameYUV);
+//        sdl2Helper.renderClear()
+//                ->renderCopy(texture, nullptr, &rect)
+//                ->renderPresent();
         easyEncoder.encode(pFrameYUV, [=, &myproducer](AVPacket *pkt) {
             // 在这里发送数据
             myproducer.sendobj((const char *) (pkt->data), pkt->size);
@@ -104,6 +104,6 @@ int main(int argc, char **argv) {
         return false;
     });
 
-    sdl2Helper.quit();
+//    sdl2Helper.quit();
 }
 
