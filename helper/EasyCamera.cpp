@@ -4,7 +4,7 @@
 
 #include "EasyCamera.h"
 #include <iostream>
-
+#include <unistd.h>
 void EasyCamera::throwException(const std::string &msg) {
     std::string logMsg = "EasyCamera -> " + msg;
     throw FFmpegFailedException(logMsg);
@@ -133,6 +133,7 @@ EasyCamera *EasyCamera::begin(const EasyCamera::CameraCaptureCallbackFunc &yuvCa
                     exit = yuvCallback(pFrameYUV);
                 });
             }
+            usleep(2000);
         } else {
             exit = true;
         }
