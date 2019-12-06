@@ -69,7 +69,7 @@ AVPacket *EasyVideoDecoder::parse(const uint8_t *buf, size_t size) {
         int len = av_parser_parse2(pCodecParserCtx, pCodecCtx, &pkt.data, &pkt.size, buf, size, AV_NOPTS_VALUE,
                                    AV_NOPTS_VALUE, AV_NOPTS_VALUE);
         buf += len;
-        cout << size << " -> " << len <<  " -> " << pkt.size << endl;
+//        cout << size << " -> " << len <<  " -> " << pkt.size << endl;
         size -= len;
     }
     if (pkt.size == 0)
