@@ -71,19 +71,19 @@ void ndn_rtpc::myExpressInterest_detect(string name , long lifetime){
 			bind(&ndn_rtpc::onData_detect,this,_1,_2),
 			bind(&ndn_rtpc::onNack_detect,this,_1,_2),
 			bind(&ndn_rtpc::onTimeout_detect,this,_1));
-	cout << "expressInterest : " << interest.getName() << endl ;
+//	cout << "expressInterest : " << interest.getName() << endl ;
 }
 
 void ndn_rtpc::onData_detect(const Interest& interest , const Data& data){
 	char buff[80] ;
 	int content_size = data.getContent().value_size() ;
-	cout<< "content_size = " << content_size << endl ;
+//	cout<< "content_size = " << content_size << endl ;
 	memcpy(buff, data.getContent().value(), content_size ) ;
 	uint32_t seq = *((uint32_t*)(buff+4)) ;
 	buff[content_size] = 0 ;
 	this->start_time = buff+8 ;
 	recvList.setFrontIndicate(seq) ;
-	cout << "start_time = " << start_time << endl ;
+//	cout << "start_time = " << start_time << endl ;
 	if(this->pkt_seq == -1) this->pkt_seq = seq ;
 	while(this->pkt_seq < seq + 4){
 		string name = prefix+"/"+start_time + "/"+ to_string(pkt_seq) ;

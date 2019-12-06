@@ -49,7 +49,7 @@ int ndn_rtpp::sendobj(const char *data, int len){
                             content_len+4) ;
         this->m_keyChain.sign(data_pkt) ;
         this->m_face->put(data_pkt) ;
-        cout << "put data : " << data_pkt.getName() << endl ;
+//        cout << "put data : " << data_pkt.getName() << endl ;
     }
 }
 
@@ -73,7 +73,7 @@ void *ndn_rtpp::run(void *param){
 void ndn_rtpp::onInterest(const InterestFilter& filter, const Interest& interest) {
 //    cout << "onInterest : " << interest.getName() << endl ;
     if(!interest.getMustBeFresh()){
-        cout << "data interest" << endl ;
+//        cout << "data interest" << endl ;
         return ;
     }
     Data sig_pkt ;
