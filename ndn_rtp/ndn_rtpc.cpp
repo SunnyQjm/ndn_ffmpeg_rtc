@@ -85,7 +85,7 @@ void ndn_rtpc::onData_detect(const Interest& interest , const Data& data){
 	recvList.setFrontIndicate(seq) ;
 //	cout << "start_time = " << start_time << endl ;
 	if(this->pkt_seq == -1) this->pkt_seq = seq ;
-	while(this->pkt_seq < seq + 4){
+	while(this->pkt_seq < seq + 2){
 		string name = prefix+"/"+start_time + "/"+ to_string(pkt_seq) ;
 		myExpressInterest(name, 100) ;
 		this->pkt_seq ++ ;
