@@ -41,7 +41,6 @@ void *dealAudio(void *args) {
 
         // 在这里接收数据，并得到Packet
         recvLen = audioConsumer.readobj(buff);
-        cout << "receive audio: " << recvLen << endl;
         dealAudioParam->sdl2Helper->feedPCM(buff, recvLen);
     }
 }
